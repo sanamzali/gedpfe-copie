@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+      "target": "ES6",
+      "module": "ESNext",
+      "moduleResolution": "node",
+      "baseUrl": "./",
+      "types": ["vue", "vite/client"],
+      "allowJs": true,
+      "paths": {
+        
+        "@/*": ["resources/js/*"],
+      "@components/*": ["resources/js/components/*"],
+      "@ui/*": ["resources/js/components/ui/*"]
+      }
+    },
+    "include": [
+      "resources/js/**/*.js",
+      "resources/js/**/*.vue"
+    ], "exclude": ["node_modules"]
+  }
+  
