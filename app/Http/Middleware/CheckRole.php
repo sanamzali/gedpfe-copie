@@ -7,11 +7,17 @@ use Illuminate\Support\Facades\Auth;
 class CheckRole
 {
     public function handle(Request $request, Closure $next, $role)
-    {
-        if (!Auth::check() || Auth::user()->role !== $role) {
-            abort(403, 'Accès non autorisé');
-        }
-
-        return $next($request);
+{
+    // Vérifie si l'utilisateur est authentifié
+    if (!Auth::check()) {
+        abort(403, 'Accès non autorisé');
     }
+
+    // Vérifie si l'utilisateur a le rôle requis
+    if (Auth::user()->role !== $role) {
+        abort(403, 'Accès non autorisé');
+    }
+
+    return $next($request);
+}
 }

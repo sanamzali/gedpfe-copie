@@ -4,33 +4,50 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import axios from 'axios'
+import { useRouter } from 'vue-router';
+
 
 // Déclaration des variables réactives pour le formulaire
 const email = ref('')
 const password = ref('')
 const errors = ref<{ email?: string; password?: string }>({})
 
-const submit = async () => {  
+const router = useRouter();
+
+const submit = async () => {
     try {
-        errors.value = {}; // Réinitialiser les erreurs avant l'envoi  
-        const response = await axios.post('/login', {  
-            email: email.value,  
-            password: password.value, 
-        });  
-        
-        if (response.data.success) {  
+        errors.value = {}; // Réinitialiser les erreurs avant l'envoi
+
+        // Validation côté client (optionnel)
+        if (!email.value || !password.value) {
+            errors.value = { email: 'Email et mot de passe requis' };
+            return;
+        }
+
+        const response = await axios.post('/login', {
+            email: email.value,
+            password: password.value,
+        });
+
+        if (response.data.success) {
+            // Stockez le token et le rôle dans le localStorage
+            localStorage.setItem('auth-token', response.data.token);
+            localStorage.setItem('user-role', response.data.user.role);
+
+            // Redirigez en fonction du rôle
             const userRole = response.data.user.role;
             if (userRole === 'admin') {
-                window.location.href = '/admin/dashboard';
+                router.push({ name: 'AdminDashboard' }); // Utilisez le nom de la route
             } else if (userRole === 'user') {
-                window.location.href = '/user/dashboard';
+                router.push({ name: 'UserDashboard' }); // Utilisez le nom de la route
             }
         }
-    } catch (error) {  
-        if (error.response && error.response.data.errors) {  
-            errors.value = error.response.data.errors;  
+    } catch (error) {
+        if (error.response && error.response.data.errors) {
+            errors.value = error.response.data.errors;
         } else {
             console.error('Erreur lors de la connexion:', error);
+            errors.value = { email: 'Une erreur est survenue. Veuillez réessayer.' };
         }
     }
 };
@@ -77,7 +94,7 @@ const submit = async () => {
             <span v-if="errors.password" class="text-red-500">{{ errors.password }}</span>
           </div>
 
-          <Button type="submit" class="w-full">Login</Button>
+          <Button type="submit" class="w-full" onclick={submit()}>Login</Button>
         </form>
       </div>
     </div>
